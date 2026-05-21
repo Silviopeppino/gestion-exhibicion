@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gestión de Exhibición — Farmacias RED</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --red: #C8102E;
+  --red-dark: #9B0D22;
+  --red-light: #FDECEA;
+  --black: #111111;
+  --gray-900: #1A1A1A;
+  --gray-700: #444444;
+  --gray-500: #888888;
+  --gray-300: #CCCCCC;
+  --gray-100: #F4F4F4;
+  --gray-50: #FAFAFA;
+  --white: #FFFFFF;
+  --green: #1E7B45;
+  --green-light: #EAF3DE;
+  --amber: #854F0B;
+  --amber-light: #FAEEDA;
+  --blue: #185FA5;
+  --blue-light: #E6F1FB;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--gray-50);color:var(--black);font-size:14px;line-height:1.6;}
+.hidden{display:none!important;}
+
+/* ── LOGIN ── */
+#screen-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--black);}
+.login-box{background:var(--white);border-radius:var(--radius-lg);padding:40px;width:380px;box-shadow:var(--shadow-md);}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
+.login-logo-dot{width:32px;height:32px;background:var(--red);border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.login-logo-dot svg{width:18px;height:18px;fill:white;}
+.login-brand{font-size:15px;font-weight:600;color:var(--black);}
+.login-sub{font-size:12px;color:var(--gray-500);}
+.login-title{font-size:22px;font-weight:600;margin-bottom:4px;}
+.login-desc{font-size:13px;color:var(--gray-500);margin-bottom:28px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--gray-700);margin-bottom:6px;}
+.field input{width:100%;padding:10px 12px;border:1px solid var(--gray-300);border-radius:var(--radius);font-family:var(--font);font-size:14px;color:var(--black);background:var(--white);outline:none;transition:border-color .15s;}
+.field input:focus{border-color:var(--red);}
+.login-error{background:#FDECEA;color:var(--red-dark);font-size:12px;padding:10px 12px;border-radius:var(--radius);margin-bottom:16px;display:none;}
+.btn-primary{width:100%;padding:11px;background:var(--red);color:white;border:none;border-radius:var(--radius);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s;}
+.btn-primary:hover{background:var(--red-dark);}
+.login-hint{margin-top:16px;font-size:11px;color:var(--gray-500);text-align:center;}
+.login-hint b{color:var(--gray-700);}
+
+/* ── SHELL ── */
+#screen-app{display:flex;flex-direction:column;min-height:100vh;}
+
+/* topbar */
+.topbar{background:var(--white);border-bottom:1px solid #EBEBEB;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:16px;}
+.topbar-logo{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.topbar-dot{width:24px;height:24px;background:var(--red);border-radius:5px;display:flex;align-items:center;justify-content:center;}
+.topbar-dot svg{width:13px;height:13px;fill:white;}
+.topbar-brand{font-size:13px;font-weight:600;color:var(--black);}
+.topbar-divider{width:1px;height:20px;background:#EBEBEB;}
+.topbar-nav a{font-size:13px;color:var(--gray-500);text-decoration:none;padding:4px 8px;border-radius:6px;cursor:pointer;}
+.topbar-nav a.active,
+.topbar-nav a:hover{color:var(--black);background:var(--gray-100);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.topbar-user{text-align:right;}
+.topbar-user-name{font-size:13px;font-weight:500;color:var(--black);}
+.topbar-user-email{font-size:11px;color:var(--gray-500);}
+.btn-salir{padding:5px 12px;border:1px solid var(--gray-300);border-radius:var(--radius);font-family:var(--font);font-size:12px;color:var(--gray-700);background:white;cursor:pointer;}
+.btn-salir:hover{background:var(--gray-100);}
+
+/* main area */
+.main{flex:1;padding:28px 24px;max-width:1100px;width:100%;margin:0 auto;}
+
+/* breadcrumb */
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-500);margin-bottom:20px;}
+.breadcrumb a{color:var(--gray-500);cursor:pointer;text-decoration:none;}
+.breadcrumb a:hover{color:var(--black);}
+.breadcrumb span{color:var(--gray-300);}
+.breadcrumb b{color:var(--black);font-weight:500;}
+
+/* page header */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;}
+.page-title{font-size:24px;font-weight:600;color:var(--black);}
+.page-sub{font-size:13px;color:var(--gray-500);margin-top:2px;}
+.btn-action{padding:9px 16px;background:var(--black);color:white;border:none;border-radius:var(--radius);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.btn-action:hover{background:var(--gray-900);}
+.btn-action.red{background:var(--red);}
+.btn-action.red:hover{background:var(--red-dark);}
+.btn-secondary{padding:8px 14px;background:white;color:var(--black);border:1px solid var(--gray-300);border-radius:var(--radius);font-family:var(--font);font-size:13px;cursor:pointer;}
+.btn-secondary:hover{background:var(--gray-100);}
+.btn-group{display:flex;gap:8px;}
+
+/* table */
+.table-wrap{background:white;border:1px solid #EBEBEB;border-radius:var(--radius-lg);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #EBEBEB;background:var(--gray-50);}
+tbody tr{border-bottom:1px solid #F0F0F0;cursor:pointer;transition:background .1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--gray-50);}
+tbody td{padding:13px 16px;font-size:13px;color:var(--black);}
+.td-id{font-family:var(--mono);font-size:12px;color:var(--gray-500);}
+.td-name{font-weight:500;}
+.zone-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;}
+.zone-cba{background:#E6F1FB;color:#185FA5;}
+.zone-nea{background:#EAF3DE;color:#27500A;}
+.salon-count{font-family:var(--mono);font-size:12px;}
+.salon-count.has{color:var(--green);font-weight:500;}
+.salon-count.empty{color:var(--gray-300);}
+.progress-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;}
+.dot-ok{background:var(--green);}
+.dot-empty{background:var(--gray-300);}
+
+/* metric cards */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.metric-card{background:white;border:1px solid #EBEBEB;border-radius:var(--radius-lg);padding:16px 20px;}
+.metric-label{font-size:11px;color:var(--gray-500);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.metric-val{font-size:28px;font-weight:600;color:var(--black);line-height:1;}
+.metric-sub{font-size:11px;color:var(--gray-500);margin-top:4px;}
+.metric-card.red .metric-val{color:var(--red);}
+.metric-card.green .metric-val{color:var(--green);}
+
+/* salon detail */
+.salon-desc{font-size:13px;color:var(--gray-500);margin-bottom:20px;line-height:1.7;max-width:600px;}
+.salon-table .table-wrap{margin-bottom:0;}
+
+/* editor visual */
+.editor-toolbar{display:flex;align-items:center;gap:12px;padding:10px 14px;background:white;border:1px solid #EBEBEB;border-radius:var(--radius);margin-bottom:12px;flex-wrap:wrap;}
+.editor-toolbar label{font-size:12px;color:var(--gray-500);}
+.editor-tabs{display:flex;gap:0;border:1px solid #EBEBEB;border-radius:var(--radius);overflow:hidden;margin-right:auto;}
+.editor-tab{padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;color:var(--gray-500);background:white;border:none;font-family:var(--font);}
+.editor-tab.active{background:var(--black);color:white;}
+.editor-canvas-wrap{position:relative;border:1px solid #EBEBEB;border-radius:var(--radius-lg);overflow:hidden;background:var(--gray-50);}
+.editor-canvas{position:relative;width:100%;background:white;overflow:hidden;}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(#EBEBEB 1px,transparent 1px),linear-gradient(90deg,#EBEBEB 1px,transparent 1px);background-size:20px 20px;}
+.gondola-block{position:absolute;background:white;border:1.5px solid #EBEBEB;border-radius:6px;cursor:move;user-select:none;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:box-shadow .15s,border-color .15s;font-size:11px;}
+.gondola-block:hover,.gondola-block.selected{border-color:var(--red);box-shadow:0 0 0 2px rgba(200,16,46,.15);}
+.gondola-block .g-code{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--red);}
+.gondola-block .g-name{font-size:10px;color:var(--gray-500);text-align:center;padding:0 4px;}
+.gondola-block .g-badge{font-size:9px;padding:1px 6px;border-radius:10px;margin-top:2px;}
+.badge-cal{background:#EAF3DE;color:#27500A;}
+.badge-tib{background:#FAEEDA;color:#633806;}
+.badge-fri{background:#FAECE7;color:#712B13;}
+.editor-sidebar{position:absolute;right:12px;top:12px;width:180px;background:white;border:1px solid #EBEBEB;border-radius:var(--radius);padding:12px;font-size:12px;}
+.editor-sidebar h4{font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+.sidebar-legend{display:flex;flex-direction:column;gap:6px;}
+.leg-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray-700);}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.editor-dims{margin-top:12px;font-size:10px;color:var(--gray-500);font-family:var(--mono);}
+.gondola-selected-info{background:white;border:1px solid #EBEBEB;border-radius:var(--radius);padding:12px;margin-top:10px;font-size:12px;}
+.gondola-selected-info h4{font-weight:600;margin-bottom:6px;}
+.info-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #F5F5F5;}
+.info-row:last-child{border-bottom:none;}
+.info-label{color:var(--gray-500);}
+.pill-tr{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;}
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;}
+.modal{background:white;border-radius:var(--radius-lg);padding:28px;width:420px;box-shadow:var(--shadow-md);}
+.modal-title{font-size:18px;font-weight:600;margin-bottom:4px;}
+.modal-desc{font-size:13px;color:var(--gray-500);margin-bottom:20px;}
+.modal-field{margin-bottom:14px;}
+.modal-field label{display:block;font-size:12px;font-weight:500;color:var(--gray-700);margin-bottom:5px;}
+.modal-field input,.modal-field select,.modal-field textarea{width:100%;padding:9px 12px;border:1px solid var(--gray-300);border-radius:var(--radius);font-family:var(--font);font-size:13px;outline:none;color:var(--black);}
+.modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{border-color:var(--red);}
+.modal-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.modal-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}
+.danger-zone{background:#FDECEA;border:1px solid #F5BCBC;border-radius:var(--radius);padding:14px;margin-top:20px;}
+.danger-zone h4{font-size:12px;font-weight:600;color:var(--red);margin-bottom:4px;}
+.danger-zone p{font-size:12px;color:var(--red-dark);margin-bottom:10px;}
+.btn-danger{padding:7px 14px;background:white;color:var(--red);border:1px solid var(--red);border-radius:var(--radius);font-family:var(--font);font-size:12px;cursor:pointer;}
+.btn-danger:hover{background:#FDECEA;}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="screen-login">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-dot">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div>
+        <div class="login-brand">Farmacias RED</div>
+        <div class="login-sub">Gestión de Exhibición</div>
+      </div>
+    </div>
+    <div class="login-title">Ingresar</div>
+    <div class="login-desc">Accedé con tu cuenta de administrador</div>
+    <div class="login-error" id="login-error">Usuario o contraseña incorrectos</div>
+    <div class="field">
+      <label>Correo electrónico</label>
+      <input type="email" id="login-email" placeholder="tu@mail.com" value="silviopeppino7@gmail.com"/>
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••••"/>
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Ingresar</button>
+    <div class="login-hint">Demo: <b>silviopeppino7@gmail.com</b> / <b>farmaciasred2026</b></div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="screen-app" class="hidden">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo" onclick="goTo('sucursales')">
+        <div class="topbar-dot">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="topbar-brand">Gestión de Exhibición</span>
+      </div>
+      <div class="topbar-divider"></div>
+      <div class="topbar-nav">
+        <a id="nav-sucursales" class="active" onclick="goTo('sucursales')">Sucursales</a>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-user">
+        <div class="topbar-user-name">Silvio Peppino</div>
+        <div class="topbar-user-email">Admin · silviopeppino7@gmail.com</div>
+      </div>
+      <button class="btn-salir" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="main" id="main-content"></div>
+</div>
+
+<!-- ══ MODAL NUEVA GÓNDOLA ══ -->
+<div class="modal-overlay hidden" id="modal-gondola">
+  <div class="modal">
+    <div class="modal-title">Nueva góndola</div>
+    <div class="modal-desc">Cargá las dimensiones y cantidad de estantes. Los estantes se crean automáticamente numerados de abajo hacia arriba (1 = piso) con score de visibilidad 5/10 por defecto.</div>
+    <div class="modal-row2">
+      <div class="modal-field">
+        <label>Código</label>
+        <input type="text" id="g-codigo" placeholder="Ej: G-01"/>
+      </div>
+      <div class="modal-field">
+        <label>Tipo</label>
+        <input type="text" id="g-tipo" placeholder="Estantería, Mostrador…"/>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Ancho (cm)</label>
+        <input type="number" id="g-ancho" value="120"/>
+      </div>
+      <div class="modal-field">
+        <label>Alto (cm)</label>
+        <input type="number" id="g-alto" value="180"/>
+      </div>
+      <div class="modal-field">
+        <label>Estantes</label>
+        <input type="number" id="g-estantes" value="4"/>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Tránsito</label>
+      <select id="g-transito">
+        <option value="caliente">Caliente — alto tránsito</option>
+        <option value="tibia">Tibia — tránsito medio</option>
+        <option value="fría">Fría — bajo tránsito</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Notas (opcional)</label>
+      <textarea id="g-notas" rows="2" placeholder="Referencias, marca asignada, restricciones…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-gondola')">Cancelar</button>
+      <button class="btn-action red" onclick="saveGondola()">Crear góndola</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL NUEVO SALÓN ══ -->
+<div class="modal-overlay hidden" id="modal-salon">
+  <div class="modal">
+    <div class="modal-title">Nuevo salón</div>
+    <div class="modal-desc">Ingresá los datos del espacio de ventas.</div>
+    <div class="modal-field">
+      <label>Nombre</label>
+      <input type="text" id="s-nombre" placeholder="Ej: Salón Ventas"/>
+    </div>
+    <div class="modal-row2">
+      <div class="modal-field">
+        <label>Ancho (m)</label>
+        <input type="number" id="s-ancho" placeholder="12.15" step="0.01"/>
+      </div>
+      <div class="modal-field">
+        <label>Largo (m)</label>
+        <input type="number" id="s-largo" placeholder="9.90" step="0.01"/>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Notas técnicas (opcional)</label>
+      <textarea id="s-notas" rows="3" placeholder="PB-001 según plano. Cielorraso 4m…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-salon')">Cancelar</button>
+      <button class="btn-action red" onclick="saveSalon()">Crear salón</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const USERS = { 'silviopeppino7@gmail.com': 'farmaciasred2026' };
+let currentUser = null;
+let currentView = 'sucursales';
+let currentSucursal = null;
+let currentSalon = null;
+let selectedGondola = null;
+let editorTab = 'mapa';
+let dragState = null;
+
+const SUCURSALES = [
+  {id:32,nombre:'Armada',zona:'CBA'},
+  {id:27,nombre:'Cba Shopping',zona:'CBA'},
+  {id:2,nombre:'Cerro',zona:'CBA'},
+  {id:21,nombre:'Colon',zona:'CBA'},
+  {id:29,nombre:'Itaembe Guazu',zona:'NEA'},
+  {id:25,nombre:'Libertad',zona:'CBA'},
+  {id:31,nombre:'Lugones',zona:'CBA'},
+  {id:22,nombre:'Market',zona:'NEA'},
+  {id:20,nombre:'Martinolli',zona:'CBA'},
+  {id:14,nombre:'Nuevo Centro',zona:'CBA'},
+  {id:23,nombre:'Ohiggins',zona:'CBA'},
+  {id:10,nombre:'Posadas I',zona:'NEA'},
+  {id:9,nombre:'Posadas II',zona:'NEA'},
+  {id:3,nombre:'Quintas',zona:'CBA'},
+  {id:18,nombre:'Rio Cuarto',zona:'CBA'},
+  {id:8,nombre:'Rodriguez',zona:'CBA'},
+  {id:5,nombre:'San Martin',zona:'CBA'},
+  {id:7,nombre:'Santa Rosa',zona:'NEA'},
+  {id:11,nombre:'Velez Sarsfield',zona:'CBA'},
+  {id:6,nombre:'Villa del Parque',zona:'CBA'},
+  {id:4,nombre:'Flores',zona:'CBA'},
+];
+
+// ── SUPABASE CONFIG ──
+const SUPABASE_URL = 'https://onplbytkjhaphiefykmz.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_xRsOdGS7Xbj9xAw4ruJFcw_mTwlKK_O';
+
+async function sbGet(table, params=''){
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}${params}`, {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+  });
+  return r.json();
+}
+
+async function sbPost(table, body){
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+    body: JSON.stringify(body)
+  });
+  return r.json();
+}
+
+async function sbPatch(table, id, body){
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+    body: JSON.stringify(body)
+  });
+  return r.json();
+}
+
+async function sbDelete(table, id){
+  await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: 'DELETE',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+  });
+}
+
+let salonesCache = {};
+let gondolasCache = {};
+
+async function getSalones(sucId){
+  if(salonesCache[sucId]) return salonesCache[sucId];
+  const data = await sbGet('salones', `?sucursal_id=eq.${sucId}&order=creado.asc`);
+  salonesCache[sucId] = data || [];
+  return salonesCache[sucId];
+}
+
+async function getGondolas(sucId, salId){
+  const salon = (salonesCache[sucId]||[])[salId];
+  if(!salon) return [];
+  const key = `${sucId}-${salId}`;
+  if(gondolasCache[key]) return gondolasCache[key];
+  const data = await sbGet('gondolas', `?salon_id=eq.${salon.id}&order=creado.asc`);
+  gondolasCache[key] = (data||[]).map(g=>({...g, x:g.pos_x, y:g.pos_y, w:g.pos_w, h:g.pos_h}));
+  return gondolasCache[key];
+}
+
+function doLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  if(USERS[email] && USERS[email] === pass){
+    currentUser = email;
+    err.style.display='none';
+    document.getElementById('screen-login').classList.add('hidden');
+    document.getElementById('screen-app').classList.remove('hidden');
+    goTo('sucursales');
+  } else {
+    err.style.display='block';
+  }
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogout(){
+  currentUser=null;
+  document.getElementById('screen-app').classList.add('hidden');
+  document.getElementById('screen-login').classList.remove('hidden');
+  document.getElementById('login-pass').value='';
+}
+
+async function goTo(view, sucId, salId){
+  currentView=view;
+  if(sucId!==undefined) currentSucursal=SUCURSALES.find(s=>s.id===sucId);
+  if(salId!==undefined) currentSalon=salId;
+  await render();
+}
+
+async function render(){
+  const c = document.getElementById('main-content');
+  c.innerHTML = '<div style="padding:40px;text-align:center;color:var(--gray-400);">Cargando...</div>';
+  if(currentView==='sucursales') c.innerHTML = await renderSucursales();
+  else if(currentView==='sucursal-detail') c.innerHTML = await renderSucursalDetail();
+  else if(currentView==='salon-detail') c.innerHTML = await renderSalonDetail();
+  else if(currentView==='editor-visual') c.innerHTML = renderEditor();
+  if(currentView==='editor-visual') await initEditor();
+}
+
+async function renderSucursales(){
+  const total = SUCURSALES.length;
+  const salCounts = {};
+  await Promise.all(SUCURSALES.map(async s=>{ salCounts[s.id]=(await getSalones(s.id)).length; }));
+  const conSalon = SUCURSALES.filter(s=>salCounts[s.id]>0).length;
+  const rows = SUCURSALES.map(s=>{
+    const cnt = salCounts[s.id]||0;
+    return `<tr onclick="goTo('sucursal-detail',${s.id})">
+      <td class="td-id">${s.id}</td>
+      <td class="td-name">${s.nombre}</td>
+      <td><span class="zone-badge zone-${s.zona.toLowerCase()}">${s.zona}</span></td>
+      <td class="${cnt>0?'salon-count has':'salon-count empty'}">
+        <span class="progress-dot ${cnt>0?'dot-ok':'dot-empty'}"></span>${cnt}
+      </td>
+    </tr>`;
+  }).join('');
+  return `
+    <div class="metrics">
+      <div class="metric-card"><div class="metric-label">Total sucursales</div><div class="metric-val">${total}</div><div class="metric-sub">operativas</div></div>
+      <div class="metric-card green"><div class="metric-label">Con salón cargado</div><div class="metric-val">${conSalon}</div><div class="metric-sub">relevadas</div></div>
+      <div class="metric-card"><div class="metric-label">Zona CBA</div><div class="metric-val">${SUCURSALES.filter(s=>s.zona==='CBA').length}</div><div class="metric-sub">sucursales</div></div>
+      <div class="metric-card"><div class="metric-label">Zona NEA</div><div class="metric-val">${SUCURSALES.filter(s=>s.zona==='NEA').length}</div><div class="metric-sub">sucursales</div></div>
+    </div>
+    <div class="page-header"><div><div class="page-title">Sucursales</div><div class="page-sub">${total} sucursales operativas</div></div></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>ID</th><th>Nombre</th><th>Zona</th><th>Salones cargados</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+async function renderSucursalDetail(){
+  const s = currentSucursal;
+  const sal = await getSalones(s.id);
+  const rows = sal.length ? sal.map((sl,i)=>{
+    const d=new Date(sl.creado);
+    const fecha=sl.creado?`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`:'—';
+    return `<tr onclick="goTo('salon-detail',${s.id},${i})">
+      <td class="td-name">${sl.nombre}</td>
+      <td style="font-family:var(--mono);font-size:12px;">${sl.ancho} × ${sl.largo} m</td>
+      <td style="font-size:12px;color:var(--gray-500);">${fecha}</td>
+    </tr>`;}).join('') :
+    `<tr><td colspan="3" style="text-align:center;color:var(--gray-500);padding:24px;">Sin salones cargados</td></tr>`;
+  return `
+    <div class="breadcrumb"><a onclick="goTo('sucursales')">Sucursales</a><span>›</span><b>${s.nombre}</b></div>
+    <div class="page-header">
+      <div><div class="page-title">${s.nombre}</div><div class="page-sub">ID ${s.id} · ${s.zona}</div></div>
+      <button class="btn-action red" onclick="openModal('modal-salon')">+ Crear salón</button>
+    </div>
+    <div style="font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;">Salones cargados</div>
+    <div class="table-wrap salon-table"><table>
+      <thead><tr><th>Nombre</th><th>Dimensiones</th><th>Creado</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+async function renderSalonDetail(){
+  const s = currentSucursal;
+  const salones = await getSalones(s.id);
+  const sal = salones[currentSalon];
+  if(!sal) return '<div style="padding:40px;color:var(--gray-500);">Salón no encontrado</div>';
+  const gonds = await getGondolas(s.id, currentSalon);
+  const rows = gonds.map(g=>`
+    <tr>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--red);">${g.codigo}</td>
+      <td class="td-name">${g.tipo||'—'}</td>
+      <td style="font-size:12px;">${g.ancho} × ${g.alto} cm</td>
+      <td>${g.estantes}</td>
+      <td><span class="pill-tr ${g.transito==='caliente'?'badge-cal':g.transito==='tibia'?'badge-tib':'badge-fri'}">${g.transito}</span></td>
+      <td style="font-size:11px;color:var(--gray-500);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g.notas||'—'}</td>
+    </tr>`).join('');
+  return `
+    <div class="breadcrumb"><a onclick="goTo('sucursales')">Sucursales</a><span>›</span><a onclick="goTo('sucursal-detail',${s.id})">${s.nombre}</a><span>›</span><b>${sal.nombre}</b></div>
+    <div class="page-header">
+      <div><div class="page-title">${sal.nombre}</div><div class="page-sub">${sal.ancho} × ${sal.largo} m</div></div>
+      <div class="btn-group">
+        <button class="btn-secondary" onclick="goTo('editor-visual',${s.id},${currentSalon})">Editor visual</button>
+        <button class="btn-action red" onclick="openModal('modal-gondola')">+ Agregar góndola</button>
+      </div>
+    </div>
+    <div class="salon-desc">${sal.notas||''}</div>
+    <div style="font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;">Góndolas — ${gonds.length} cargadas</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Código</th><th>Tipo</th><th>Dimensiones</th><th>Estantes</th><th>Tránsito</th><th>Notas</th></tr></thead>
+      <tbody>${rows.length?rows:`<tr><td colspan="6" style="text-align:center;color:var(--gray-500);padding:24px;">Sin góndolas cargadas</td></tr>`}</tbody>
+    </table></div>`;
+}
+
+function renderEditor(){
+  const s = currentSucursal;
+  const salones = salonesCache[s.id]||[];
+  const sal = salones[currentSalon]||{nombre:'',ancho:0,largo:0};
+  return `
+    <div class="breadcrumb"><a onclick="goTo('sucursales')">Sucursales</a><span>›</span><a onclick="goTo('sucursal-detail',${s.id})">${s.nombre}</a><span>›</span><a onclick="goTo('salon-detail',${s.id},${currentSalon})">${sal.nombre}</a><span>›</span><b>Editor visual</b></div>
+    <div class="page-header">
+      <div><div class="page-title">Editor visual</div><div class="page-sub">${sal.nombre} · ${sal.ancho} × ${sal.largo} m</div></div>
+      <button class="btn-action red" onclick="openModal('modal-gondola')">+ Nueva góndola</button>
+    </div>
+    <div class="editor-toolbar">
+      <div class="editor-tabs">
+        <button class="editor-tab active" id="etab-mapa" onclick="setEditorTab('mapa')">Mapa</button>
+        <button class="editor-tab" id="etab-visibilidad" onclick="setEditorTab('visibilidad')">Visibilidad</button>
+        <button class="editor-tab" id="etab-ocupacion" onclick="setEditorTab('ocupacion')">Ocupación</button>
+      </div>
+      <label>Plano</label>
+      <input type="range" min="0" max="100" value="0" id="opacidad-slider" style="width:100px;" oninput="document.getElementById('opacidad-val').textContent=this.value+'%'; const img=document.getElementById('plano-bg'); if(img) img.style.opacity=this.value/100;"/>
+      <span id="opacidad-val" style="font-size:12px;font-family:var(--mono);color:var(--gray-500);min-width:32px;">0%</span>
+      <button class="btn-secondary" style="font-size:12px;padding:5px 10px;" onclick="document.getElementById('plano-input').click()">Reemplazar plano</button>
+      <input type="file" id="plano-input" accept="image/*,.pdf" style="display:none;" onchange="loadPlano(this)"/>
+      <span style="font-size:12px;color:var(--gray-300);cursor:pointer;" onclick="quitarPlano()">Quitar</span>
+      <span style="margin-left:auto;font-size:12px;font-family:var(--mono);color:var(--gray-500);">${sal.ancho} × ${sal.largo} m</span>
+    </div>
+    <div class="editor-canvas-wrap">
+      <div class="editor-canvas" id="editor-canvas" style="height:480px;">
+        <div class="grid-bg"></div>
+        <div id="gondolas-layer"></div>
+        <div class="editor-sidebar">
+          <h4>Tránsito</h4>
+          <div class="sidebar-legend">
+            <div class="leg-row"><div class="leg-dot" style="background:#6DBF67;border:1px solid #3B6D11;"></div>Caliente</div>
+            <div class="leg-row"><div class="leg-dot" style="background:#F0C96B;border:1px solid #854F0B;"></div>Tibia</div>
+            <div class="leg-row"><div class="leg-dot" style="background:#F09080;border:1px solid #993C1D;"></div>Fría</div>
+          </div>
+          <div class="editor-dims">${sal.ancho} × ${sal.largo} m</div>
+        </div>
+      </div>
+    </div>
+    <div id="gondola-info-panel"></div>`;
+}
+
+let planoURL = null;
+
+function loadPlano(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    planoURL = e.target.result;
+    const canvas = document.getElementById('editor-canvas');
+    let img = document.getElementById('plano-bg');
+    if(!img){
+      img = document.createElement('img');
+      img.id = 'plano-bg';
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;z-index:0;';
+      canvas.insertBefore(img, canvas.firstChild);
+    }
+    img.src = planoURL;
+    const slider = document.getElementById('opacidad-slider');
+    if(slider){ img.style.opacity = (slider.value||30)/100; slider.value = slider.value||30; document.getElementById('opacidad-val').textContent=(slider.value||30)+'%'; }
+  };
+  reader.readAsDataURL(file);
+}
+
+function quitarPlano(){
+  planoURL = null;
+  const img = document.getElementById('plano-bg');
+  if(img) img.remove();
+  const slider = document.getElementById('opacidad-slider');
+  if(slider){ slider.value=0; document.getElementById('opacidad-val').textContent='0%'; }
+}
+
+async function initEditor(){
+  const s = currentSucursal;
+  const gonds = await getGondolas(s.id, currentSalon);
+  const layer = document.getElementById('gondolas-layer');
+  if(!layer) return;
+  layer.innerHTML='';
+  gonds.forEach(g=>{
+    const bgCol = g.transito==='caliente'?'#EAF3DE':g.transito==='tibia'?'#FAEEDA':'#FAECE7';
+    const bdCol = g.transito==='caliente'?'#3B6D11':g.transito==='tibia'?'#854F0B':'#993C1D';
+    const el = document.createElement('div');
+    el.className='gondola-block';
+    el.id='gb-'+g.id;
+    el.style.cssText=`left:${g.x||40}px;top:${g.y||40}px;width:${g.w||80}px;height:${g.h||60}px;background:${bgCol};border-color:${bdCol};`;
+    el.innerHTML=`<div class="g-code">${g.codigo}</div><div class="g-name">${g.tipo||''}</div>`;
+    el.addEventListener('mousedown', e=>startDrag(e,g,el));
+    el.addEventListener('click', ()=>selectGondola(g));
+    layer.appendChild(el);
+  });
+}
+
+function startDrag(e,g,el){
+  e.preventDefault();
+  const canvas = document.getElementById('editor-canvas');
+  const rect = canvas.getBoundingClientRect();
+  const startX = e.clientX - rect.left - (g.x||40);
+  const startY = e.clientY - rect.top - (g.y||40);
+  function onMove(e){
+    const cx = e.clientX-rect.left-startX;
+    const cy = e.clientY-rect.top-startY;
+    const nx = Math.max(0,Math.min(cx, canvas.offsetWidth-(g.w||80)));
+    const ny = Math.max(0,Math.min(cy, canvas.offsetHeight-(g.h||60)));
+    g.x=nx; g.y=ny;
+    el.style.left=nx+'px'; el.style.top=ny+'px';
+  }
+  async function onUp(){
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onUp);
+    // Guardar posición en Supabase
+    if(g.id) await sbPatch('gondolas', g.id, {pos_x:Math.round(g.x), pos_y:Math.round(g.y)});
+  }
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onUp);
+}
+
+function selectGondola(g){
+  selectedGondola=g;
+  document.querySelectorAll('.gondola-block').forEach(el=>el.classList.remove('selected'));
+  const el=document.getElementById('gb-'+g.id);
+  if(el) el.classList.add('selected');
+  const badge = g.transito==='caliente'?'<span style="background:#EAF3DE;color:#27500A;font-size:11px;padding:2px 8px;border-radius:10px;">caliente</span>':g.transito==='tibia'?'<span style="background:#FAEEDA;color:#633806;font-size:11px;padding:2px 8px;border-radius:10px;">tibia</span>':'<span style="background:#FAECE7;color:#712B13;font-size:11px;padding:2px 8px;border-radius:10px;">fría</span>';
+  document.getElementById('gondola-info-panel').innerHTML=`
+    <div class="gondola-selected-info">
+      <h4>${g.codigo} — ${g.tipo||''}</h4>
+      <div class="info-row"><span class="info-label">Tránsito</span>${badge}</div>
+      <div class="info-row"><span class="info-label">Dimensiones</span><span>${g.ancho} × ${g.alto} cm</span></div>
+      <div class="info-row"><span class="info-label">Estantes</span><span>${g.estantes}</span></div>
+      <div class="info-row"><span class="info-label">Notas</span><span style="font-size:11px;color:var(--gray-500);">${g.notas||'—'}</span></div>
+    </div>`;
+}
+
+function setEditorTab(tab){
+  editorTab=tab;
+  ['mapa','visibilidad','ocupacion'].forEach(t=>{
+    const el=document.getElementById('etab-'+t);
+    if(el) el.classList.toggle('active',t===tab);
+  });
+}
+
+function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+
+async function saveSalon(){
+  const nombre = document.getElementById('s-nombre').value.trim();
+  const ancho = parseFloat(document.getElementById('s-ancho').value);
+  const largo = parseFloat(document.getElementById('s-largo').value);
+  const notas = document.getElementById('s-notas').value.trim();
+  if(!nombre||!ancho||!largo) return alert('Completá nombre y dimensiones.');
+  const sid = currentSucursal.id;
+  const result = await sbPost('salones', {sucursal_id:sid, nombre, ancho, largo, notas});
+  if(result && result[0]) {
+    salonesCache[sid] = null; // limpiar cache
+    closeModal('modal-salon');
+    document.getElementById('s-nombre').value='';
+    document.getElementById('s-ancho').value='';
+    document.getElementById('s-largo').value='';
+    document.getElementById('s-notas').value='';
+    await render();
+  } else {
+    alert('Error al guardar. Intentá de nuevo.');
+  }
+}
+
+async function saveGondola(){
+  const codigo = document.getElementById('g-codigo').value.trim();
+  const tipo = document.getElementById('g-tipo').value.trim();
+  const ancho = parseInt(document.getElementById('g-ancho').value);
+  const alto = parseInt(document.getElementById('g-alto').value);
+  const estantes = parseInt(document.getElementById('g-estantes').value);
+  const transito = document.getElementById('g-transito').value;
+  const notas = document.getElementById('g-notas').value.trim();
+  if(!codigo) return alert('Ingresá un código.');
+  const salones = salonesCache[currentSucursal.id]||[];
+  const salon = salones[currentSalon];
+  if(!salon) return alert('Error: salón no encontrado.');
+  const n = (gondolasCache[`${currentSucursal.id}-${currentSalon}`]||[]).length;
+  const w = Math.max(60,Math.round(ancho/3));
+  const h = Math.max(40,Math.round(alto/5));
+  const result = await sbPost('gondolas', {
+    salon_id: salon.id, codigo, tipo, ancho, alto, estantes, transito, notas,
+    pos_x: 40+n*22, pos_y: 40+n*22, pos_w: w, pos_h: h
+  });
+  if(result && result[0]){
+    gondolasCache[`${currentSucursal.id}-${currentSalon}`] = null; // limpiar cache
+    closeModal('modal-gondola');
+    document.getElementById('g-codigo').value='';
+    document.getElementById('g-tipo').value='';
+    document.getElementById('g-notas').value='';
+    await render();
+  } else {
+    alert('Error al guardar góndola. Intentá de nuevo.');
+  }
+}
+
+document.getElementById('modal-gondola').addEventListener('click',e=>{if(e.target===document.getElementById('modal-gondola'))closeModal('modal-gondola');});
+document.getElementById('modal-salon').addEventListener('click',e=>{if(e.target===document.getElementById('modal-salon'))closeModal('modal-salon');});
+</script>
+</body>
+</html>
